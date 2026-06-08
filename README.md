@@ -1,4 +1,4 @@
-# Gym Tracker — GitHub Pages v7
+# Gym Tracker — GitHub Pages v9
 
 App móvil para registrar entrenamientos de fuerza desde iPhone.
 
@@ -45,3 +45,10 @@ La primera vez que abras la app, te pedirá esa contraseña en un popup. Se guar
 4. Abre la app desde el icono.
 
 La primera carga necesita internet. Después la app queda cacheada y puede registrar entrenamientos aunque el gimnasio no tenga cobertura.
+
+
+## Cambios v9
+
+- Eliminada la capa superior semitransparente que aparecía al hacer scroll en iPhone.
+- Rediseñados los controles de kg/reps para que cada número tenga más ancho y no se corte con dos o tres cifras.
+- Kg y reps ahora se muestran apilados dentro de cada serie para mejorar ergonomía en móvil.
