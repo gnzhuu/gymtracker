@@ -34,17 +34,10 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html { margin: 0; min-height: 100%; background: #070a12; color-scheme: dark; }
     body { margin: 0; min-height: 100dvh; background: #070a12; color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Inter, sans-serif; overscroll-behavior-y: contain; }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0 0 auto 0;
-      height: calc(env(safe-area-inset-top) + 64px);
-      background: linear-gradient(180deg, rgba(7,10,18,.88), rgba(7,10,18,.42), rgba(7,10,18,0));
-      -webkit-backdrop-filter: blur(22px) saturate(1.35);
-      backdrop-filter: blur(22px) saturate(1.35);
-      pointer-events: none;
-      z-index: 10;
-    }
+    /* Antes había una capa fija con blur aquí para efecto “cristal”.
+       En iPhone se veía como una barra semitransparente al hacer scroll,
+       así que la quitamos para que no aparezca ningún marco superior raro. */
+    body::before { display: none; }
     button, input, select, textarea { font: inherit; color-scheme: dark; }
     button { cursor: pointer; }
 
@@ -118,14 +111,14 @@
     .draft-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 13px; }
     .draft-head strong { font-size: 17px; letter-spacing: -.03em; }
     .draft-head span { color: var(--muted); font-size: 12px; }
-    .stepper-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .stepper-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
     .stepper-grid.compact { grid-template-columns: 1fr; margin-top: 10px; }
     .stepper { display: grid; gap: 8px; }
     .stepper-label { color: var(--muted); font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: .06em; text-align: center; }
-    .stepper-box { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 7px; align-items: center; }
-    .round-btn { width: 48px; height: 58px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.095); color: var(--text); font-size: 28px; font-weight: 950; display: grid; place-items: center; }
+    .stepper-box { display: grid; grid-template-columns: 54px minmax(112px, 1fr) 54px; gap: 9px; align-items: center; }
+    .round-btn { width: 54px; height: 58px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.095); color: var(--text); font-size: 28px; font-weight: 950; display: grid; place-items: center; }
     .round-btn:disabled { opacity: .35; }
-    .step-input { min-height: 58px; text-align: center; padding: 8px 2px; font-size: 28px; line-height: 1; font-weight: 950; letter-spacing: -.05em; border-radius: 18px; }
+    .step-input { min-height: 58px; text-align: center; padding: 8px 8px; font-size: clamp(22px, 6.8vw, 28px); line-height: 1; font-weight: 950; letter-spacing: -.035em; border-radius: 18px; min-width: 0; }
     .step-input.small { min-height: 48px; font-size: 19px; }
     .advanced-set { margin-top: 11px; border-top: 1px solid var(--line); padding-top: 10px; }
     .advanced-set summary { list-style: none; color: var(--muted); font-size: 12px; font-weight: 900; cursor: pointer; padding: 4px 0; }
@@ -179,9 +172,9 @@
       .brand h1 { font-size: 25px; }
       .group-grid { gap: 8px; }
       .stepper-grid { grid-template-columns: 1fr; }
-      .stepper-box { grid-template-columns: 44px minmax(0, 1fr) 44px; }
-      .round-btn { width: 44px; }
-      .step-input { font-size: 25px; }
+      .stepper-box { grid-template-columns: 48px minmax(104px, 1fr) 48px; gap: 8px; }
+      .round-btn { width: 48px; }
+      .step-input { font-size: 23px; }
     }
   </style>
 </head>
@@ -399,7 +392,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzZAoObxSIoS2zq3WtVS_BVWm7EHDJtccdHu4rYzrIxlhX0u11e9qw0ZYtSd8_jGLPo/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbw_KF1Gf4Ajv8X--dCSb5JL0VbPCQoGawI-NKoN8u0wSlQ8kJqZKiZttF-HD0MVxn3F/exec';
 
     const DEFAULT_EXERCISES = {
       'Pecho': ['Press banca', 'Press inclinado mancuerna', 'Aperturas', 'Fondos'],
