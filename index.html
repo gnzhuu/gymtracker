@@ -361,6 +361,8 @@
       <div class="card soft">
         <div class="section-title"><h2>Offline</h2></div>
         <p class="hint">Puedes guardar series sin cobertura. La app queda cacheada en el iPhone y se sincroniza con Google Sheets cuando vuelva internet.</p>
+        <button id="updateAppBtn" class="btn secondary" type="button">Actualizar app</button>
+        <p class="hint" style="margin-top:10px">Usa este botón si GitHub Pages ya tiene cambios pero el iPhone sigue mostrando una versión antigua. No borra tus entrenamientos ni la contraseña.</p>
       </div>
     </section>
   </main>
@@ -393,6 +395,7 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzZAoObxSIoS2zq3WtVS_BVWm7EHDJtccdHu4rYzrIxlhX0u11e9qw0ZYtSd8_jGLPo/exec';
+    const APP_VERSION = 'v10';
 
     const DEFAULT_EXERCISES = {
       'Pecho': ['Press banca', 'Press inclinado mancuerna', 'Aperturas', 'Fondos'],
@@ -494,6 +497,7 @@
 
       $('addExerciseBtn').addEventListener('click', addExercise);
       $('manualSyncBtn').addEventListener('click', () => syncPending(true));
+      $('updateAppBtn').addEventListener('click', updateApp);
       $('saveApiTokenBtn').addEventListener('click', saveApiTokenFromModal);
       $('skipApiTokenBtn').addEventListener('click', () => {
         localStorage.setItem(LS.setupSkipped, '1');
@@ -1292,9 +1296,51 @@
     }
 
     function registerServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      if (!('serviceWorker' in navigator)) return;
+
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        // Pide al navegador que compruebe si hay una versión nueva del service worker.
+        reg.update().catch(() => {});
+
+        // Si hay una versión nueva instalada, toma el control cuanto antes.
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+        reg.addEventListener('updatefound', () => {
+          const worker = reg.installing;
+          if (!worker) return;
+          worker.addEventListener('statechange', () => {
+            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+              toast('Actualización preparada. Pulsa Actualizar app.');
+            }
+          });
+        });
+      }).catch(() => {});
+    }
+
+    async function updateApp() {
+      toast('Actualizando app…');
+
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(reg => {
+            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            if (reg.active) reg.active.postMessage({ type: 'CLEAR_CACHES' });
+            return reg.update().catch(() => {});
+          }));
+        }
+
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(key => caches.delete(key)));
+        }
+      } catch (err) {
+        console.warn(err);
       }
+
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 450);
     }
 
     function getGroups() {
